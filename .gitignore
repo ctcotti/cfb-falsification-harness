@@ -1,0 +1,7 @@
+.env
+.env.*
+!.env.example
+.python/
+data/cache/
+__pycache__/
+*.parquet

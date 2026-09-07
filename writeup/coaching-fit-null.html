@@ -1,0 +1,498 @@
+<title>Systems Travel, Edges Don't</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+
+<style>
+:root{
+  --ground:#F2F4F7;
+  --surface:#FFFFFF;
+  --surface-sunk:#E9ECF1;
+  --ink:#161B23;
+  --ink-soft:#454F5E;
+  --ink-faint:#6E7889;
+  --rule:#D3D9E2;
+  --rule-firm:#B4BDCA;
+  --accent:#2F5578;
+  --accent-soft:#E2EAF2;
+  --null:#9C3440;
+  --null-soft:#F3E2E4;
+  --held:#3F6B52;
+  --held-soft:#E1EDE6;
+  --shadow:0 1px 2px rgba(22,27,35,.05);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ground:#0E1218;
+    --surface:#161B23;
+    --surface-sunk:#11161D;
+    --ink:#E6EAF0;
+    --ink-soft:#A9B3C1;
+    --ink-faint:#78838F;
+    --rule:#28303B;
+    --rule-firm:#3A4552;
+    --accent:#7FA9CE;
+    --accent-soft:#1B2836;
+    --null:#D98A93;
+    --null-soft:#2C1B1F;
+    --held:#8CBBA0;
+    --held-soft:#182620;
+    --shadow:0 1px 2px rgba(0,0,0,.4);
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#0E1218;
+  --surface:#161B23;
+  --surface-sunk:#11161D;
+  --ink:#E6EAF0;
+  --ink-soft:#A9B3C1;
+  --ink-faint:#78838F;
+  --rule:#28303B;
+  --rule-firm:#3A4552;
+  --accent:#7FA9CE;
+  --accent-soft:#1B2836;
+  --null:#D98A93;
+  --null-soft:#2C1B1F;
+  --held:#8CBBA0;
+  --held-soft:#182620;
+  --shadow:0 1px 2px rgba(0,0,0,.4);
+}
+
+*{box-sizing:border-box}
+body{
+  background:var(--ground);
+  color:var(--ink);
+  font-family:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  font-size:16px; line-height:1.62;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1040px;margin:0 auto;padding:0 28px 96px}
+.col{max-width:64ch}
+h1,h2,h3{font-family:Spectral,Georgia,"Times New Roman",serif;text-wrap:balance;margin:0}
+h1{font-size:clamp(2.3rem,5.2vw,3.5rem);font-weight:600;line-height:1.08;letter-spacing:-.015em}
+h2{font-size:1.55rem;font-weight:600;line-height:1.2}
+h3{font-size:1.05rem;font-weight:600}
+p{margin:0}
+a{color:var(--accent)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:2px}
+
+.eyebrow{
+  font-family:"IBM Plex Mono",ui-monospace,monospace;
+  font-size:.7rem;letter-spacing:.13em;text-transform:uppercase;
+  color:var(--ink-faint);
+}
+
+/* ---- masthead ---- */
+header.mast{padding:64px 0 40px;border-bottom:1px solid var(--rule-firm)}
+.mast-inner{display:flex;flex-direction:column;gap:22px}
+.standfirst{
+  font-family:Spectral,Georgia,serif;font-size:1.3rem;line-height:1.5;
+  color:var(--ink-soft);max-width:56ch;
+}
+.standfirst b{color:var(--ink);font-weight:600}
+.meta{
+  display:flex;flex-wrap:wrap;gap:0 34px;row-gap:10px;
+  padding-top:8px;border-top:1px solid var(--rule);
+  font-family:"IBM Plex Mono",monospace;font-size:.76rem;color:var(--ink-faint);
+}
+.meta span b{color:var(--ink-soft);font-weight:500}
+
+/* ---- generic section ---- */
+section{padding:52px 0;border-bottom:1px solid var(--rule)}
+section:last-of-type{border-bottom:0}
+.sec-head{display:flex;flex-direction:column;gap:10px;margin-bottom:26px}
+.stack{display:flex;flex-direction:column;gap:18px}
+.lede{font-size:1.05rem;color:var(--ink-soft)}
+
+/* ---- verdict strip ---- */
+.verdict{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(196px,1fr));
+  gap:1px;background:var(--rule);border:1px solid var(--rule);
+  border-radius:3px;overflow:hidden;margin-top:30px;
+}
+.vcell{background:var(--surface);padding:18px 20px;display:flex;flex-direction:column;gap:5px}
+.vcell .k{font-family:"IBM Plex Mono",monospace;font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-faint)}
+.vcell .v{font-family:"IBM Plex Mono",monospace;font-size:1.42rem;font-weight:500;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.vcell .n{font-size:.8rem;color:var(--ink-faint);line-height:1.4}
+.v.is-null{color:var(--null)}
+.v.is-held{color:var(--held)}
+
+/* ---- numbered tests ---- */
+.test{
+  display:grid;grid-template-columns:auto 1fr;gap:0 22px;
+  padding:26px 0;border-top:1px solid var(--rule);
+}
+.test:first-of-type{border-top:0}
+.tnum{
+  font-family:"IBM Plex Mono",monospace;font-size:.78rem;font-weight:500;
+  color:var(--ink-faint);padding-top:5px;font-variant-numeric:tabular-nums;
+}
+.tbody{display:flex;flex-direction:column;gap:12px;min-width:0}
+.thead{display:flex;flex-wrap:wrap;align-items:baseline;gap:10px 14px}
+.tag{
+  font-family:"IBM Plex Mono",monospace;font-size:.66rem;letter-spacing:.1em;
+  text-transform:uppercase;padding:3px 9px;border-radius:2px;white-space:nowrap;
+}
+.tag.killed{background:var(--null-soft);color:var(--null)}
+.tag.held{background:var(--held-soft);color:var(--held)}
+.tbody p{color:var(--ink-soft);max-width:62ch}
+.tbody p b{color:var(--ink);font-weight:600}
+
+/* ---- data tables ---- */
+.tscroll{overflow-x:auto;margin:2px 0}
+table{border-collapse:collapse;width:100%;min-width:440px;font-size:.87rem}
+caption{
+  text-align:left;padding-bottom:9px;font-size:.8rem;color:var(--ink-faint);
+}
+th,td{padding:8px 14px 8px 0;text-align:left;border-bottom:1px solid var(--rule)}
+thead th{
+  font-family:"IBM Plex Mono",monospace;font-size:.68rem;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--ink-faint);font-weight:500;
+  border-bottom:1px solid var(--rule-firm);
+}
+tbody tr:last-child td{border-bottom:0}
+td.num,th.num{text-align:right;font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums;padding-right:0}
+td.num{white-space:nowrap}
+tr.emph td{font-weight:600;color:var(--ink)}
+.mono{font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums}
+.dim{color:var(--ink-faint)}
+
+/* ---- variance bar ---- */
+.vbar{display:flex;height:26px;border-radius:2px;overflow:hidden;border:1px solid var(--rule-firm)}
+.vbar div{display:flex;align-items:center;justify-content:center;font-family:"IBM Plex Mono",monospace;font-size:.68rem;color:#fff}
+.vlegend{display:flex;flex-wrap:wrap;gap:6px 20px;font-size:.78rem;color:var(--ink-faint);font-family:"IBM Plex Mono",monospace}
+.vlegend i{display:inline-block;width:9px;height:9px;border-radius:1px;margin-right:7px}
+
+/* ---- chart panel ---- */
+.panel{
+  background:var(--surface);border:1px solid var(--rule);border-radius:3px;
+  padding:26px 26px 20px;box-shadow:var(--shadow);
+}
+.panel-head{display:flex;flex-direction:column;gap:6px;margin-bottom:18px}
+.panel-head h3{font-family:"IBM Plex Sans",sans-serif;font-size:.95rem}
+.chart-scroll{overflow-x:auto}
+svg{display:block;max-width:100%}
+.figcap{margin-top:14px;padding-top:12px;border-top:1px solid var(--rule);font-size:.8rem;color:var(--ink-faint);max-width:74ch}
+
+/* ---- callout ---- */
+.callout{
+  border-left:2px solid var(--accent);background:var(--accent-soft);
+  padding:16px 20px;border-radius:0 3px 3px 0;
+}
+.callout p{color:var(--ink-soft);max-width:60ch}
+.callout p b{color:var(--ink)}
+
+/* ---- limitations ---- */
+.lim{display:grid;grid-template-columns:repeat(auto-fit,minmax(258px,1fr));gap:20px}
+.lim article{display:flex;flex-direction:column;gap:7px;padding-top:14px;border-top:2px solid var(--rule-firm)}
+.lim h3{font-family:"IBM Plex Sans",sans-serif;font-size:.9rem}
+.lim p{font-size:.87rem;color:var(--ink-soft)}
+
+footer{padding:40px 0 0;border-top:1px solid var(--rule-firm);margin-top:8px}
+.repro{
+  font-family:"IBM Plex Mono",monospace;font-size:.78rem;color:var(--ink-soft);
+  background:var(--surface-sunk);border:1px solid var(--rule);border-radius:3px;
+  padding:14px 18px;overflow-x:auto;white-space:pre;
+}
+@media (max-width:620px){
+  .test{grid-template-columns:1fr;gap:8px}
+  .tnum{padding-top:0}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+<div class="wrap">
+
+<header class="mast">
+  <div class="mast-inner">
+    <p class="eyebrow">Pre-registered falsification · FBS 2015–2025 · CollegeFootballData</p>
+    <h1>Systems Travel, Edges Don't</h1>
+    <p class="standfirst">A coach's system does move with him between schools — that part of the thesis survived every test I threw at it. What did not survive is the claim that a mismatch between system and quarterback shows up in scoring margin the betting market missed. <b>The effect is bounded below a third of what it would take to beat the vig.</b></p>
+    <div class="meta">
+      <span><b>5,022</b> team-games</span>
+      <span><b>770</b> team-season clusters</span>
+      <span><b>405</b> API calls, all cached</span>
+      <span><b>3</b> falsification tests</span>
+      <span>Analysis run <b>2026-09-07</b></span>
+    </div>
+  </div>
+</header>
+
+<section>
+  <div class="col stack">
+    <div class="sec-head">
+      <p class="eyebrow">The claim under test</p>
+      <h2>An interaction the market has no machinery to price</h2>
+    </div>
+    <p class="lede">Betting lines are built from additive power ratings. A coach's record is in the number and a quarterback's pedigree is in the number, but fit between them is an interaction, and additive models have no term for it. If mismatch costs real points, that cost sits outside the price by construction.</p>
+    <p>The hypothesis is unusually falsifiable because it forbids main effects. Distance between a system and a player is symmetric: neither the coach being good nor the quarterback being good predicts it. So a signal with no main effect and a live interaction would be the signature of something genuinely unpriced — and a main effect turning up instead would be evidence the mechanism is something else entirely.</p>
+    <p>Coaching changes make the cleanest test bed. A system arrives intact because it lives in the coach's head; the roster he inherits was assembled by other people for a different system. In the collective era, quarterback acquisition runs through boosters and revenue-share allocation rather than the head coach, so the pairing is not selected on fit.</p>
+
+    <div class="verdict">
+      <div class="vcell">
+        <span class="k">Premise · systems travel</span>
+        <span class="v is-held">55.8%</span>
+        <span class="n">of play-calling identity is the coach, against 9.1% school and 35.1% year</span>
+      </div>
+      <div class="vcell">
+        <span class="k">Consequence · Test B</span>
+        <span class="v is-null">+0.01</span>
+        <span class="n">points per SD, 95% CI [−0.33, +0.35]. p = 0.958</span>
+      </div>
+      <div class="vcell">
+        <span class="k">Bound on any edge</span>
+        <span class="v is-null">0.88pp</span>
+        <span class="n">excluded above this; break-even at −110 needs 2.38pp</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="sec-head col">
+    <p class="eyebrow">Sequence · each test gated the next</p>
+    <h2>Three falsification tests, run before any model was built</h2>
+    <p class="lede">Every one of these was specified with its decision rule fixed in advance. Two killed a component of the design. Running them first is what made the whole project cost a session instead of a season.</p>
+  </div>
+
+  <div class="test">
+    <div class="tnum">01</div>
+    <div class="tbody">
+      <div class="thead">
+        <h3>Does a coach's system travel with him?</h3>
+        <span class="tag held">Premise held</span>
+      </div>
+      <p>The benchmark is not zero — some drift across a job change is ordinary year-to-year wobble. So I compared two one-year differences on the same footing: a coach's change across a move against his change across an ordinary season at one school. Writing the axis as <span class="mono">μ + α<sub>coach</sub> + β<sub>school</sub> + ε<sub>year</sub></span>, the ratio of their variances is <span class="mono">1 + σ²<sub>β</sub>/σ²<sub>ε</sub></span>. Rule fixed in advance: <b>ratio below 2.0 means systems travel</b>.</p>
+      <p>Early-down pass rate on neutral downs, z-scored within season, over 62 same-coach school changes and 1,001 same-coach same-school season pairs: <b>ratio 1.26</b>, 95% CI [0.83, 1.72] — passing even at the upper bound. Correlation across a move, 0.558.</p>
+      <div class="vbar" role="img" aria-label="Variance decomposition of early-down pass rate: coach 55.8 percent, school 9.1 percent, year 35.1 percent">
+        <div style="width:55.8%;background:var(--held)">coach 55.8%</div>
+        <div style="width:9.1%;background:var(--accent)"></div>
+        <div style="width:35.1%;background:var(--ink-faint)">year 35.1%</div>
+      </div>
+      <div class="vlegend">
+        <span><i style="background:var(--held)"></i>coach identity</span>
+        <span><i style="background:var(--accent)"></i>school effect 9.1%</span>
+        <span><i style="background:var(--ink-faint)"></i>year-to-year, of which ~4pp is binomial sampling</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="test">
+    <div class="tnum">02</div>
+    <div class="tbody">
+      <div class="thead">
+        <h3>Is designed QB run rate a coach attribute?</h3>
+        <span class="tag killed">Axis killed</span>
+      </div>
+      <p>It led the candidate-axis list, and it is poison. Correlation across a job change: <b>0.005</b>. A coach's designed-run rate at his old school tells you nothing about his rate at the new one, because the rate is set by whether the quarterback can run — a roster property. Variance decomposition: coach <b>0.5%</b>, school 38.1%, year 61.4%.</p>
+      <p>Had it entered the system vector, the quarterback would have sat on both sides of the distance measure, shrinking the gap hardest for exactly the worst-fit pairs. That is not attenuation toward zero; it reorders which games look like mismatches.</p>
+      <div class="callout">
+        <p><b>The variance ratio alone would have waved it through.</b> QB run share scored 1.62 against a 2.0 threshold. The ratio compares the school effect to year noise and is silent on whether a coach effect exists at all — only the near-zero correlation exposed that σ²<sub>coach</sub> ≈ 0. Both statistics are needed; the pre-registered rule was incomplete.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="test">
+    <div class="tnum">03</div>
+    <div class="tbody">
+      <div class="thead">
+        <h3>Is the quarterback's situational profile measurable?</h3>
+        <span class="tag killed">Component killed</span>
+      </div>
+      <p>The QB side of the fit measure had to be a <em>contrast</em> — passing-down efficiency minus early-down efficiency, within player — because any non-contrast measure is quality, and quality is a main effect the market already prices. The contrast differences quality out, which is exactly what the hypothesis needs.</p>
+      <p>It differences out everything else too. <b>Split-half reliability: −0.008.</b> Split one quarterback's own season randomly in half, compute the contrast on each half, and the halves do not agree. Year-over-year correlation +0.068 [−0.01, +0.15], against +0.283 for overall EPA per dropback on the same players.</p>
+      <div class="tscroll">
+        <table>
+          <caption>Components are individually stable; their difference is not.</caption>
+          <thead><tr><th>Measure</th><th class="num">Year-over-year r</th><th class="num">Split-half</th></tr></thead>
+          <tbody>
+            <tr class="emph"><td>Situational contrast <span class="dim">(the intended q<sub>p</sub>)</span></td><td class="num">+0.068</td><td class="num">−0.008</td></tr>
+            <tr><td>Overall EPA/dropback <span class="dim">(benchmark)</span></td><td class="num">+0.283</td><td class="num">—</td></tr>
+            <tr><td>Early-down EPA alone</td><td class="num">+0.241</td><td class="num">—</td></tr>
+            <tr><td>Passing-down EPA alone</td><td class="num">+0.173</td><td class="num">—</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>The bind is general, not specific to this axis: <b>what makes a quarterback measure fit-relevant is exactly what makes it unstable.</b> With a median of eight neutral-script obvious-passing-down plays per quarterback-season against a per-play EPA standard deviation near 1.5, there is nothing left underneath.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="sec-head col">
+    <p class="eyebrow">The gate</p>
+    <h2>What survived, and what it returned</h2>
+    <p class="lede">With no measurable quarterback attribute, the testable form is adaptation cost: a quarterback is now in a system some distance from the one he last played in, both sides measured as the same shrunk multi-season estimate of a coach's play-calling. Split-sample reliability of that estimate is 0.886, and returning quarterbacks under continuing coaches score a distance of exactly zero, as they must.</p>
+  </div>
+
+  <div class="panel">
+    <div class="panel-head">
+      <h3>Every interval falls short of break-even</h3>
+      <p class="eyebrow">Effect on cover probability, percentage points · 95% CI · SEs clustered on team-season</p>
+    </div>
+    <div class="chart-scroll">
+      <svg viewBox="0 0 760 292" width="760" height="292" role="img" aria-label="Confidence intervals for five specifications. Every interval's upper bound falls short of the 2.38 percentage point break-even threshold; the widest, the top decile of system distance, reaches 2.14.">
+        <!-- scale: x(pp) = 318 + pp*100 -->
+        <line x1="318" y1="44" x2="318" y2="230" stroke="var(--rule-firm)" stroke-width="1"/>
+        <!-- break-even at 2.38pp -->
+        <line x1="556" y1="36" x2="556" y2="230" stroke="var(--null)" stroke-width="1.5" stroke-dasharray="4 3"/>
+        <text x="556" y="28" fill="var(--null)" font-family="IBM Plex Mono, monospace" font-size="11" text-anchor="middle">break-even 2.38pp</text>
+
+        <g font-family="IBM Plex Mono, monospace" font-size="11.5">
+          <!-- Test B thesis -->
+          <text x="0" y="64" fill="var(--ink)" font-size="12">Test B · 2022–25</text>
+          <line x1="232.9" y1="60" x2="408.3" y2="60" stroke="var(--accent)" stroke-width="2.5"/>
+          <line x1="232.9" y1="54" x2="232.9" y2="66" stroke="var(--accent)" stroke-width="1.5"/>
+          <line x1="408.3" y1="54" x2="408.3" y2="66" stroke="var(--accent)" stroke-width="1.5"/>
+          <circle cx="320.3" cy="60" r="4.5" fill="var(--accent)"/>
+          <text x="736" y="64" fill="var(--ink-faint)" text-anchor="end">n=2350</text>
+
+          <!-- Test B long -->
+          <text x="0" y="102" fill="var(--ink)" font-size="12">Test B · 2015–25</text>
+          <line x1="256.1" y1="98" x2="410.8" y2="98" stroke="var(--accent)" stroke-width="2.5"/>
+          <line x1="256.1" y1="92" x2="256.1" y2="104" stroke="var(--accent)" stroke-width="1.5"/>
+          <line x1="410.8" y1="92" x2="410.8" y2="104" stroke="var(--accent)" stroke-width="1.5"/>
+          <circle cx="332.7" cy="98" r="4.5" fill="var(--accent)"/>
+          <text x="736" y="102" fill="var(--ink-faint)" text-anchor="end">n=5022</text>
+
+          <!-- p75 -->
+          <text x="0" y="140" fill="var(--ink)" font-size="12">|distance| &gt; p75</text>
+          <line x1="258.7" y1="136" x2="526.9" y2="136" stroke="var(--ink-faint)" stroke-width="2.5"/>
+          <line x1="258.7" y1="130" x2="258.7" y2="142" stroke="var(--ink-faint)" stroke-width="1.5"/>
+          <line x1="526.9" y1="130" x2="526.9" y2="142" stroke="var(--ink-faint)" stroke-width="1.5"/>
+          <circle cx="392.5" cy="136" r="4.5" fill="var(--ink-faint)"/>
+          <text x="736" y="140" fill="var(--ink-faint)" text-anchor="end">n=583</text>
+
+          <!-- p90 -->
+          <text x="0" y="178" fill="var(--ink)" font-size="12">|distance| &gt; p90</text>
+          <line x1="181.3" y1="174" x2="532.1" y2="174" stroke="var(--ink-faint)" stroke-width="2.5"/>
+          <line x1="181.3" y1="168" x2="181.3" y2="180" stroke="var(--ink-faint)" stroke-width="1.5"/>
+          <line x1="532.1" y1="168" x2="532.1" y2="180" stroke="var(--ink-faint)" stroke-width="1.5"/>
+          <circle cx="356.4" cy="174" r="4.5" fill="var(--ink-faint)"/>
+          <text x="736" y="178" fill="var(--ink-faint)" text-anchor="end">n=231</text>
+
+          <!-- Test A -->
+          <text x="0" y="216" fill="var(--ink)" font-size="12">Test A · in the price?</text>
+          <line x1="305.1" y1="212" x2="431.5" y2="212" stroke="var(--held)" stroke-width="2.5"/>
+          <line x1="305.1" y1="206" x2="305.1" y2="218" stroke="var(--held)" stroke-width="1.5"/>
+          <line x1="431.5" y1="206" x2="431.5" y2="218" stroke="var(--held)" stroke-width="1.5"/>
+          <circle cx="367.5" cy="212" r="4.5" fill="var(--held)"/>
+          <text x="736" y="216" fill="var(--ink-faint)" text-anchor="end">p=0.122</text>
+        </g>
+
+        <!-- axis -->
+        <line x1="118" y1="250" x2="618" y2="250" stroke="var(--rule-firm)" stroke-width="1"/>
+        <g font-family="IBM Plex Mono, monospace" font-size="11" fill="var(--ink-faint)" text-anchor="middle">
+          <line x1="118" y1="250" x2="118" y2="255" stroke="var(--rule-firm)"/><text x="118" y="270">−2</text>
+          <line x1="218" y1="250" x2="218" y2="255" stroke="var(--rule-firm)"/><text x="218" y="270">−1</text>
+          <line x1="318" y1="250" x2="318" y2="255" stroke="var(--rule-firm)"/><text x="318" y="270">0</text>
+          <line x1="418" y1="250" x2="418" y2="255" stroke="var(--rule-firm)"/><text x="418" y="270">1</text>
+          <line x1="518" y1="250" x2="518" y2="255" stroke="var(--rule-firm)"/><text x="518" y="270">2</text>
+          <line x1="618" y1="250" x2="618" y2="255" stroke="var(--rule-firm)"/><text x="618" y="270">3</text>
+        </g>
+        <text x="368" y="288" fill="var(--ink-faint)" font-family="IBM Plex Mono, monospace" font-size="10.5" text-anchor="middle">effect on cover probability (percentage points)</text>
+      </svg>
+    </div>
+    <p class="figcap">Converted from points of margin at 0.4/σ<sub>game</sub> with σ<sub>game</sub> = 15.51, measured from the residuals rather than assumed. The widest upper bound anywhere — the top decile of system distance, 35 clusters — reaches 2.14pp and still falls short of the 2.38pp needed to clear vig at −110.</p>
+  </div>
+
+  <div class="col stack" style="margin-top:34px">
+    <h3>It is not that the market got there first</h3>
+    <p>Test A asks whether system distance is already in the price. With a thin first stage — prior-season SP+, recruiting, home field, R² = 0.656 — it looked significant at +0.365, p = 0.010. Adding returning production and a coaching-change indicator moved the first stage to R² = 0.673 and dropped the coefficient to <b>+0.192, p = 0.122</b>. The earlier result was omitted-variable bias.</p>
+    <p>So both sides return null. The market does not price system distance, <em>and</em> system distance does not predict what the market missed. That is a more interesting failure than being front-run: the interaction does not exist at measurable magnitude.</p>
+    <div class="tscroll">
+      <table>
+        <caption>Secondary specifications, thesis window unless noted.</caption>
+        <thead><tr><th>Specification</th><th class="num">Coefficient</th><th class="num">95% CI</th><th class="num">p</th></tr></thead>
+        <tbody>
+          <tr class="emph"><td>Test B — (margin − market) ~ Φ</td><td class="num">+0.009</td><td class="num">[−0.33, +0.35]</td><td class="num">0.958</td></tr>
+          <tr><td>Week-decay interaction Φ × early</td><td class="num">−0.250</td><td class="num">[−0.80, +0.30]</td><td class="num">0.370</td></tr>
+          <tr><td>Era interaction Φ × collective <span class="dim">(long)</span></td><td class="num">−0.238</td><td class="num">[−0.99, +0.51]</td><td class="num">0.535</td></tr>
+          <tr><td>Coach quality <span class="dim">(must be null)</span></td><td class="num">−0.002</td><td class="num">[−0.06, +0.06]</td><td class="num">0.945</td></tr>
+          <tr><td>Recruiting composite <span class="dim">(must be null)</span></td><td class="num">−0.001</td><td class="num">[−0.01, +0.01]</td><td class="num">0.844</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>The pure-interaction test passes in the uninteresting direction: neither coach quality nor recruiting predicts the residual, which is what a market leaving no simple money on the table should look like. The thesis predicted a decaying edge concentrated in early weeks; the week interaction is null and, if anything, signed the wrong way.</p>
+  </div>
+</section>
+
+<section>
+  <div class="sec-head col">
+    <p class="eyebrow">Instrumentation</p>
+    <h2>Three source defects that would have corrupted the study silently</h2>
+    <p class="lede">Each of these is plausible-looking, populated, and wrong. None throws an error. Together they were worth more than any modelling decision in the project.</p>
+  </div>
+  <div class="tscroll">
+    <table>
+      <thead><tr><th>Field</th><th>What it looks like</th><th>What it actually is</th></tr></thead>
+      <tbody>
+        <tr>
+          <td class="mono">/coaches.hireDate</td>
+          <td>98.5% populated, plausible dates</td>
+          <td>The coach's <b>first head-coaching hire ever</b>. Moorhead at Akron 2022 reads 2017-11-28 — his Mississippi State hire. Wrong for every coach on a second job, which is most of the treatment set.</td>
+        </tr>
+        <tr>
+          <td class="mono">/coaches/tenures.startYear</td>
+          <td>A tenure's first season</td>
+          <td><b>FBS-scoped.</b> Cignetti's James Madison tenure reads 2022 against a 2018 hire, because JMU played FCS through 2021. Labels every reclassification coach as year-one.</td>
+        </tr>
+        <tr>
+          <td class="mono">Coach-season rows</td>
+          <td>One row per coach who worked</td>
+          <td><b>Phantom 0-game rows</b> — an outgoing coach's end year runs a season long. Holgorsen appears in Houston 2024 with zero games, which a "sole coach of record" filter turns into the exclusion of Fritz, who coached all twelve.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="col stack" style="margin-top:26px">
+    <p>Two structural facts also shaped what was testable. The enriched play endpoints carrying air yards and structured passer IDs exist for <b>2025 only</b> — advertised in the schema with no coverage caveat — so anything built on them has a one-season backtest. And no scramble play type exists anywhere in the 49-type vocabulary: a scramble and a designed quarterback run are the same record.</p>
+    <p>Quarterback attribution was therefore parsed from play text, at <b>99.963%</b> coverage over 259,446 scrimmage plays. The residual misses are the source's own <span class="mono">N/A</span> placeholders and kneel-downs.</p>
+  </div>
+</section>
+
+<section>
+  <div class="sec-head col">
+    <p class="eyebrow">Boundaries of the claim</p>
+    <h2>What this does not establish</h2>
+  </div>
+  <div class="lim">
+    <article>
+      <h3>A weaker hypothesis than intended</h3>
+      <p>This tested adaptation cost — distance between systems — not coach–quarterback fit. The stronger version was unbuildable because the quarterback attribute had no measurable signal. A charting source with time-to-throw and pressure could revive it, on a one-season backtest.</p>
+    </article>
+    <article>
+      <h3>One axis, k = 1</h3>
+      <p>Systems are represented by a single number: neutral early-down pass rate. It is the axis that survived a stability test, but a richer representation might find structure this cannot. The sample will not support estimating one.</p>
+    </article>
+    <article>
+      <h3>The lines are not verified closes</h3>
+      <p>CFBD carries no timestamp on a line. These are late prices of unknown vintage — adequate to ask whether a signal is in the price at all, not adequate for closing-line value, which needs a timestamped second source.</p>
+    </article>
+    <article>
+      <h3>Test A is a weak test</h3>
+      <p>Its first stage tops out near R² = 0.67 because prior-season ratings are a poor proxy for what the market knows. Test B carries the verdict precisely because it needs no first stage.</p>
+    </article>
+    <article>
+      <h3>The portal boundary is sharp</h3>
+      <p>Transfer rate among tape-qualified starters jumps from 5.3% to 29.3% at the one-time-transfer rule. Pre-2022 seasons are not a usable control period — the treatment barely existed.</p>
+    </article>
+    <article>
+      <h3>Absence at this magnitude only</h3>
+      <p>An effect below roughly 0.9pp of cover probability is entirely consistent with these data. The claim is that no <em>tradeable</em> effect exists, not that the coefficient is exactly zero.</p>
+    </article>
+  </div>
+</section>
+
+<footer class="col">
+  <p class="eyebrow" style="margin-bottom:12px">Reproduction</p>
+  <p style="color:var(--ink-soft);margin-bottom:16px">Every API response is cached content-addressed on endpoint and parameters, so the analysis re-runs offline and the backfill is idempotent. Completed seasons cache permanently; the live season carries a twelve-hour TTL. A budget guard refuses calls past 25,000 against the tier's 30,000-per-month ceiling.</p>
+  <div class="repro">python scripts/backfill.py --dry-run   # prices the plan before spending
+python scripts/build_panel.py          # coach panel, tenure-dated
+python scripts/test_systems_travel.py  # test 01
+python scripts/test_qp_stability.py    # test 03
+python scripts/stage3_gate_game.py     # the gate</div>
+  <p style="color:var(--ink-faint);font-size:.82rem;margin-top:20px">Walk-forward discipline throughout: coaching hires, portal moves and recruiting classes filtered by announcement date rather than season label. No pooled cross-validation across seasons. Effect sizes and the minimum detectable effect were fixed before the gate was run.</p>
+</footer>
+
+</div>
