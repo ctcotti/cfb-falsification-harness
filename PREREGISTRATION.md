@@ -108,6 +108,123 @@ Two independent grounds for not running it:
 Registered and not run, recorded here rather than dropped, because a decision
 not to run is exactly what a file drawer would swallow.
 
+## G1 — opener drift. An instrumental gate, not a tradeable claim.
+
+Registered 2026-09-08, before the first regression was run.
+
+**Status.** This is not a third primary hypothesis and cannot support a claim
+about an edge. It is a gate on a *data purchase*: whether to pay for a
+timestamped, limit-carrying odds feed. Registering it anyway, with the rule
+fixed first, because the alternative — running it informally and deciding
+afterwards what it meant — is the specification search §3 exists to prevent.
+
+**Why it is not tradeable.** CFBD records `spreadOpen`/`overUnderOpen` and one
+later number of unknown vintage. No odds-history endpoint exists — `/lines/
+history`, `/odds`, `/odds/history`, `/lines/movement`, `/betting/lines` and
+`/lines/providers` all 404, verified 2026-09-08. So a result here says whether
+information exists in line movement; it cannot say whether that information was
+reachable, because we do not know when the later price was observable.
+
+**Specification.** Per game, with CFBD's home-team sign convention:
+
+```
+spread:  drift = spreadOpen - spread          (drift in implied HOME margin)
+         resid = home_margin + spread
+total:   drift = overUnder - overUnderOpen
+         resid = actual_total - overUnder
+```
+
+Regress `resid ~ drift`. β > 0 means the number moved the right way and stopped
+short — follow the move. β < 0 means it overshot. β = 0 means the recorded price
+has fully absorbed its own movement, and there is no visible structure to buy a
+feed for.
+
+**Sample.** FBS–FBS regular-season games with both an opener and a later number:
+3,723 spread, 3,728 total, seasons **2021–2025 only** — openers do not exist
+before 2021. Median across books on both legs.
+
+**Inference.** Wild cluster bootstrap-t with the null imposed, clustered on
+season-week (~75 clusters), reusing `phase0_wildboot.py`. Cluster-robust SEs are
+reported alongside but do not carry the verdict; Phase 0 measured the CRVE
+over-rejecting at 9.5% against a nominal 5% on 35 clusters, and 75 is not
+comfortably clear of that.
+
+**Multiplicity.** Two legs, so α = 0.025 each (Bonferroni at N = 2).
+
+**MDE at 80% power, α = 0.025.** Computed from drift dispersion and σ alone; no
+residual was regressed on anything to obtain it.
+
+| leg | n moved | drift SD | MDE (resid pts per drift pt) | at mean drift |
+|---|---:|---:|---:|---:|
+| spread | 3,225 | 2.20 | 0.382 | 1.57 pp |
+| total | 3,400 | 2.23 | 0.387 | 1.70 pp |
+
+Both below the 2.38pp break-even, so the gate can answer its question.
+
+**Known mechanical bias, quantified in advance.** The later price appears in the
+regressor with one sign and in the outcome with the other, so measurement error
+in it induces a spurious negative β of roughly −Var(err)/Var(drift). With a
+cross-book SD near 0.29 over 2–4 books, Var(err) ≈ 0.028 against Var(drift) ≈
+4.84, giving a bias near **−0.006** — an order of magnitude under the MDE, but
+reported rather than assumed away, and it means a *small negative* β is the one
+result that must not be believed.
+
+**Decision rule, fixed in advance.**
+
+- Bootstrap CI excludes zero **and** the implied edge at mean |drift| exceeds
+  2.38pp → information exists and is large; price the feed.
+- CI excludes zero but the implied edge is below 2.38pp → information exists and
+  is too small to trade at these stakes; do not buy on this basis.
+- CI includes zero and excludes effects above 2.38pp → the recorded price
+  absorbs its own movement; do not buy on this basis.
+- CI includes zero and does not exclude 2.38pp → underpowered, report as such,
+  claim nothing.
+
+### Result: the price absorbs its own movement. Do not buy the feed on this basis.
+
+Run 2026-09-08 by `scripts/phase3_drift_gate.py`. Third decision-rule branch on
+both legs: CI includes zero *and* excludes any effect above break-even.
+
+| leg | n | G | β (resid pts per drift pt) | bootstrap 95% | boot p | edge at mean drift | CI edge |
+|---|---:|---:|---:|---|---:|---:|---:|
+| spread, moved | 3225 | 77 | −0.058 | [−0.288, +0.164] | 0.600 | 0.24 pp | 1.19 pp |
+| spread, all | 3723 | 77 | −0.057 | [−0.281, +0.165] | 0.613 | 0.20 pp | 1.00 pp |
+| total, moved | 3400 | 77 | +0.072 | [−0.174, +0.315] | 0.560 | 0.32 pp | 1.38 pp |
+| total, all | 3728 | 77 | +0.064 | [−0.183, +0.307] | 0.599 | 0.25 pp | 1.23 pp |
+
+The two legs disagree in sign and neither is distinguishable from zero. This is a
+bounded null, not an underpowered one: even the CI-edge effect reaches 1.38pp
+against the 2.38pp needed at −110. Whatever the market learned between the
+opener and the recorded price, the recorded price already contains it.
+
+**The pre-registered bias estimate was wrong, by a factor of thirteen.** It said
+the artefact would be about −0.006. Measured, it is **−0.078 for the spread leg**
+and −0.032 for the total. The error was mine and it was elementary: I estimated
+Var(error) from the *median* cross-book SD of 0.29, when the variance is governed
+by the mean of squared dispersion and cross-book dispersion is heavy-tailed —
+p90 SD is 1.32, and single games run to spreads of 8.5 against 12.5.
+
+This matters more than a footnote, because for the spread leg **the artefact
+alone is larger than the observed coefficient**. Adjusting to first order:
+
+| leg | raw β | artefact | adjusted β | edge at mean drift |
+|---|---:|---:|---:|---:|
+| spread | −0.058 | −0.078 | **+0.020** | 0.08 pp |
+| total | +0.072 | −0.032 | **+0.104** | 0.46 pp |
+
+So the one apparently-negative result is fully explained by measurement error,
+and the adjustment moves both legs to small positive coefficients that remain far
+inside their intervals. The adjustment is approximate — it ignores the
+attenuation from error in the opener, which pushes the true coefficient toward
+zero as well. Every version of this is a null.
+
+**What this does and does not license.** It says the recorded price has absorbed
+its own movement, on 3,700 games across 2021–25, well enough to bound any
+follow-the-move effect below break-even. It does *not* say line movement is
+uninformative in general: the vintage of the later price is unknown, so a feed
+with real timestamps could still reveal intraday structure this cannot see. It
+removes the cheapest reason to buy one, not every reason.
+
 ## Layer 4 allocator
 
 Proceeds regardless, per the brief. Validated against a synthetic edge source

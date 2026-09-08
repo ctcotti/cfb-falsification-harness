@@ -133,6 +133,31 @@ the MDE is **3.10× the mechanical ceiling**, so no outcome would change a
 decision. `scripts/phase2_power.py` reads no total, spread or residual anywhere,
 so the decision was fixable without seeing the answer.
 
+**Opener drift: a third null, on data already cached.** Before pricing a
+timestamped odds feed, the cheap version of the question — is there information
+in line movement that the recorded price has not absorbed? CFBD carries
+`spreadOpen`/`overUnderOpen` on 3,723 games, 2021–25, and no odds-history
+endpoint exists (`/lines/history`, `/odds/history`, `/lines/movement` all 404).
+Registered with its rule fixed first, α = 0.025 per leg, wild cluster bootstrap
+on 77 season-week clusters:
+
+| leg | n | β | bootstrap 95% | p | edge at mean drift | CI edge |
+|---|---:|---:|---|---:|---:|---:|
+| spread | 3225 | −0.058 | [−0.288, +0.164] | 0.600 | 0.24 pp | 1.19 pp |
+| total | 3400 | +0.072 | [−0.174, +0.315] | 0.560 | 0.32 pp | 1.38 pp |
+
+Signs disagree, neither is distinguishable from zero, and the CI edge reaches
+1.38pp against 2.38pp needed. A bounded null, not an underpowered one.
+
+The pre-registered measurement-error bias was **wrong by 13×** — stated as
+−0.006, measured at −0.078 on the spread leg, because it was computed from the
+*median* cross-book SD when variance is governed by the mean of squares and
+dispersion is heavy-tailed. That matters: the artefact is larger than the spread
+coefficient it was supposed to contaminate. Bias-adjusted, both legs move to
+small positives (+0.020 and +0.104) still far inside their intervals. Every
+version is a null. It removes the cheapest reason to buy a timestamped feed, not
+every reason — the vintage of the recorded price is still unknown.
+
 **The allocator was built anyway**, per the brief — a rigorous null plus a
 working, validated optimiser is a stronger pair than a marginal positive.
 
@@ -183,6 +208,7 @@ scripts/
   phase0_contrast_arith.py  why the q_p contrast was arithmetically doomed
   build_pace.py          the Phase 2 axis, and its construct check
   phase2_power.py        the power calculation that refused the hypothesis
+  phase3_drift_gate.py   opener-to-recorded-price drift, the feed-purchase gate
   test_allocator.py      12 checks against known ground truth
 ```
 
@@ -213,6 +239,7 @@ python scripts/phase0_contrast_arith.py
 
 python scripts/build_pace.py           # Phase 2 axis (needs /drives, 168 calls)
 python scripts/phase2_power.py         # the verdict: do not run
+python scripts/phase3_drift_gate.py    # opener drift gate, no new data
 python scripts/test_allocator.py       # allocator validation, no data needed
 ```
 
