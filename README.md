@@ -91,6 +91,73 @@ no scramble play type exists in the 49-type vocabulary — a scramble and a
 designed QB run are the same record. QB attribution is therefore parsed from
 play text at **99.963%** coverage over 259,446 scrimmage plays.
 
+## Phase 2 — a second null, and the allocator
+
+Full detail and decision rules in [PREREGISTRATION.md](PREREGISTRATION.md),
+written before any Phase 2 specification touched a betting line.
+
+**Defensive continuity: dropped before registration.** It needs coordinator
+quality. CFBD has head coaches only — `/coordinators`, `/coaches/coordinators`,
+`/staff`, `/coaching/staff` and `/teams/staff` all 404, no OpenAPI document is
+served, and neither `/coaches` nor `/coaches/tenures` carries a position field.
+
+**Pace under-adjustment in totals: registered, powered, not run.** The axis is
+good — neutral-script, opponent-adjusted seconds per play from `/drives`, with
+split-half reliability **0.927** against Phase 1's 0.886 — and the signal is
+real. A coach's as-of pace estimate keeps 28.1% of its variance after being
+residualised against the team's own lagged pace, and what survives still
+predicts realised pace at β = +0.664, se 0.154, p < 0.0001.
+
+It dies on magnitude, every link measured rather than assumed:
+
+```
+1 SD of the orthogonalised coach signal
+  -> 0.165 SD of realised pace
+  -> 0.0669 drives per game
+  -> 0.206 points of total
+  -> 0.50 pp of cover probability      against 2.38 pp needed at -110
+```
+
+The weak link is pace → drives: **−0.406 drives per game per SD of pace**, not
+the −1.51 an SD-for-SD conversion assumes. Cross-section −0.406, team fixed
+effects −0.399, first differences −0.352. Game clock is fixed, so a slower snap
+is absorbed mostly by plays per drive rather than by the drive count. The
+identity T = D(π_ij + π_ji) holds; the assumption that a coach's pace preference
+moves D much does not.
+
+Two independent grounds for not running it. The ceiling is below break-even —
+0.50pp at one SD *assuming the market prices none* of a signal built from public
+coaching history; at game level 34 of 2,472 games clear 2.38pp under that
+assumption and **zero** do if the market prices half. And on that same sample
+the MDE is **3.10× the mechanical ceiling**, so no outcome would change a
+decision. `scripts/phase2_power.py` reads no total, spread or residual anywhere,
+so the decision was fixable without seeing the answer.
+
+**The allocator was built anyway**, per the brief — a rigorous null plus a
+working, validated optimiser is a stronger pair than a marginal positive.
+
+    max_f E[log(1 + f'R)]   s.t.  f >= 0,  f_i <= l_i,  sum f_i <= 1
+
+Concave under log utility, so there is a unique optimum and the solver can be
+*checked* rather than trusted. Correlation is carried by the scenarios, not by a
+covariance matrix: team strengths are drawn once per scenario and shared across
+that team's games, so two bets on the same team are dependent in the sample
+without anyone writing down a ρ. Twelve validation checks against ground truth
+the optimiser cannot fake — closed-form Kelly, brute-force grid search, a KKT
+certificate that is *shown to reject* a perturbed allocation, and out-of-sample
+growth against flat and edge-proportional staking.
+
+Two results from that suite worth stating on their own:
+
+- At λ = 0.25 the allocator keeps 43% of the growth rate while lifting
+  1st-percentile wealth from 0.68 to 0.92. That is the fractional-Kelly trade,
+  measured.
+- When edge estimates are noisier than the spread of true edges, betting on them
+  **destroys** wealth: log-growth −0.0029 raw. James–Stein shrinkage cuts the
+  damage to −0.0001 but does not reverse the sign. With no measurable edge the
+  right allocation is zero, and the allocator finds it — check 6 puts 0.4% of
+  bankroll at risk on a fair book.
+
 ## Layout
 
 ```
@@ -114,6 +181,18 @@ scripts/
   phase0_wildboot.py     wild cluster bootstrap-t on the tails; --validate
                          runs the size check that justifies it
   phase0_contrast_arith.py  why the q_p contrast was arithmetically doomed
+  build_pace.py          the Phase 2 axis, and its construct check
+  phase2_power.py        the power calculation that refused the hypothesis
+  test_allocator.py      12 checks against known ground truth
+```
+
+Phase 2 additions to `src/cfb/`:
+
+```
+  pace.py             neutral-script, opponent-adjusted seconds per play
+  scenarios.py        joint posterior predictive; correlation via shared
+                      team parameters, not a covariance matrix
+  allocator.py        the convex program, James-Stein, fractional Kelly
 ```
 
 ## Running it
@@ -131,6 +210,10 @@ python scripts/build_games.py
 python scripts/stage3_gate_game.py     # the gate
 python scripts/phase0_wildboot.py      # few-cluster correction on the tails
 python scripts/phase0_contrast_arith.py
+
+python scripts/build_pace.py           # Phase 2 axis (needs /drives, 168 calls)
+python scripts/phase2_power.py         # the verdict: do not run
+python scripts/test_allocator.py       # allocator validation, no data needed
 ```
 
 Every response is cached content-addressed on (endpoint, sorted params), so
