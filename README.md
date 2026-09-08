@@ -20,9 +20,27 @@ It does not survive contact with the data.
 | Long 2015–25 | +0.057 | [−0.24, +0.36] | 0.711 |
 
 5,022 team-games, 770 team-season clusters, SEs clustered on team-season. The
-interval **excludes any effect larger than ~0.88pp of cover probability**,
+interval **excludes any effect larger than ~0.95pp of cover probability**,
 against a 2.38pp break-even at −110. Nothing in the tail either: |distance| >
-p90 gives +0.149 [−0.53, +0.83].
+p90 gives +0.137 [−0.55, +0.83].
+
+The tail specifications are thin — the top decile has 35 clusters — and the
+cluster-robust variance estimator is asymptotic in *clusters*, not observations.
+Simulated on that exact cluster structure it rejects a true null **9.5%** of the
+time at a nominal 5%. Re-run under a wild cluster bootstrap-t with the null
+imposed (Rademacher, 9,999 replications, interval by test inversion), which
+rejects at **5.9%**:
+
+| Specification | n | G | γ̂ | cluster-robust | bootstrap | bootstrap upper, pp |
+|---|---|---|---|---|---|---|
+| Test B, thesis | 2350 | 330 | +0.009 | [−0.33, +0.35] | [−0.39, +0.37] | 0.95 |
+| Test B, long | 5022 | 770 | +0.057 | [−0.24, +0.36] | [−0.28, +0.37] | 0.94 |
+| \|distance\| > p75 | 581 | 83 | +0.270 | [−0.25, +0.79] | [−0.43, +0.79] | 2.02 |
+| \|distance\| > p90 | 230 | 35 | +0.137 | [−0.55, +0.83] | [−0.91, +0.76] | **1.95** |
+
+Correction widens every interval — 1.21× at the top decile — but asymmetrically,
+and to the left. The top-decile upper bound *falls*, from 2.12pp to 1.95pp, so
+the exclusion claim strengthens rather than survives.
 
 **Test A — is it already in the price?** With a thin first stage (R²=0.656) Φ
 looked significant (+0.365, p=0.010); adding returning production and a
@@ -93,6 +111,9 @@ scripts/
   build_games.py         outcomes joined to market prices
   stage3_gate.py         the gate, team-season level
   stage3_gate_game.py    the gate, game level (carries the verdict)
+  phase0_wildboot.py     wild cluster bootstrap-t on the tails; --validate
+                         runs the size check that justifies it
+  phase0_contrast_arith.py  why the q_p contrast was arithmetically doomed
 ```
 
 ## Running it
@@ -108,6 +129,8 @@ python scripts/test_systems_travel.py
 python scripts/test_qp_stability.py
 python scripts/build_games.py
 python scripts/stage3_gate_game.py     # the gate
+python scripts/phase0_wildboot.py      # few-cluster correction on the tails
+python scripts/phase0_contrast_arith.py
 ```
 
 Every response is cached content-addressed on (endpoint, sorted params), so
@@ -133,5 +156,5 @@ This tested **adaptation cost**, not coach–QB fit — the strong version was
 unbuildable, not disproven. Systems are represented by one axis (k=1). CFBD
 lines carry no timestamp, so these are late prices of unknown vintage: adequate
 to ask whether a signal is in the price, not adequate for closing-line value.
-An effect below ~0.9pp of cover probability remains entirely consistent with
+An effect below ~0.95pp of cover probability remains entirely consistent with
 these data.

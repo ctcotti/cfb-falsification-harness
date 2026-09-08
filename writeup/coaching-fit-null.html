@@ -207,7 +207,7 @@ footer{padding:40px 0 0;border-top:1px solid var(--rule-firm);margin-top:8px}
   <div class="mast-inner">
     <p class="eyebrow">Pre-registered falsification · FBS 2015–2025 · CollegeFootballData</p>
     <h1>Systems Travel, Edges Don't</h1>
-    <p class="standfirst">A coach's system does move with him between schools — that part of the thesis survived every test I threw at it. What did not survive is the claim that a mismatch between system and quarterback shows up in scoring margin the betting market missed. <b>The effect is bounded below a third of what it would take to beat the vig.</b></p>
+    <p class="standfirst">A coach's system does move with him between schools — that part of the thesis survived every test I threw at it. What did not survive is the claim that a mismatch between system and quarterback shows up in scoring margin the betting market missed. <b>The effect is bounded below two fifths of what it would take to beat the vig.</b></p>
     <div class="meta">
       <span><b>5,022</b> team-games</span>
       <span><b>770</b> team-season clusters</span>
@@ -241,8 +241,8 @@ footer{padding:40px 0 0;border-top:1px solid var(--rule-firm);margin-top:8px}
       </div>
       <div class="vcell">
         <span class="k">Bound on any edge</span>
-        <span class="v is-null">0.88pp</span>
-        <span class="n">excluded above this; break-even at −110 needs 2.38pp</span>
+        <span class="v is-null">0.95pp</span>
+        <span class="n">excluded above this after bootstrap correction; break-even at −110 needs 2.38pp</span>
       </div>
     </div>
   </div>
@@ -288,6 +288,7 @@ footer{padding:40px 0 0;border-top:1px solid var(--rule-firm);margin-top:8px}
       <p>Had it entered the system vector, the quarterback would have sat on both sides of the distance measure, shrinking the gap hardest for exactly the worst-fit pairs. That is not attenuation toward zero; it reorders which games look like mismatches.</p>
       <div class="callout">
         <p><b>The variance ratio alone would have waved it through.</b> QB run share scored 1.62 against a 2.0 threshold. The ratio compares the school effect to year noise and is silent on whether a coach effect exists at all — only the near-zero correlation exposed that σ²<sub>coach</sub> ≈ 0. Both statistics are needed; the pre-registered rule was incomplete.</p>
+        <p><b>This was a protocol deviation.</b> The cross-move correlation criterion was added after the variance ratio had already passed — a decision rule changed once the data had been seen, which is the exact move pre-registration exists to prevent. It is defensible here because the addition made the rule <em>stricter</em> and because it is disclosed rather than absorbed, but disclosure is what makes it acceptable, not harmlessness. It is named as a deviation for the same reason it is reported at all.</p>
       </div>
     </div>
   </div>
@@ -313,7 +314,9 @@ footer{padding:40px 0 0;border-top:1px solid var(--rule-firm);margin-top:8px}
           </tbody>
         </table>
       </div>
-      <p>The bind is general, not specific to this axis: <b>what makes a quarterback measure fit-relevant is exactly what makes it unstable.</b> With a median of eight neutral-script obvious-passing-down plays per quarterback-season against a per-play EPA standard deviation near 1.5, there is nothing left underneath.</p>
+      <p>With a median of eight neutral-script obvious-passing-down plays per quarterback-season against a per-play EPA standard deviation near 1.5, there is nothing left underneath.</p>
+      <p><b>An earlier draft claimed the bind was general</b> — that what makes a quarterback measure fit-relevant is what makes it unstable. That is too strong, and the arithmetic says so. For a difference D = X<sub>1</sub> − X<sub>2</sub>, the classical reliability (Cronbach &amp; Furby 1970) is ρ<sub>D</sub> = (ρ<sub>11</sub>s₁² + ρ<sub>22</sub>s₂² − 2ρ<sub>12</sub>s₁s₂) / (s₁² + s₂² − 2ρ<sub>12</sub>s₁s₂). The intercorrelation of the two bins, measured on the same 1,396 quarterback-seasons, is <b>+0.293</b> — above the +0.207 at which a difference of components this reliable has exactly zero reliability. Plugging the measured values in predicts ρ<sub>D</sub> = −0.08 against the observed +0.068. <b>The null was forced by the difference operator before any football entered it.</b> A usable contrast (ρ<sub>D</sub> = 0.30) would have required the two bins to be <em>negatively</em> correlated at −0.13, which two measures of the same passer will never be.</p>
+      <p>That is a narrower claim than the one it replaces, and deliberately so. It governs <em>unshrunk single-season differences</em> and says nothing about estimators that never form one. Pooling seasons raises component reliability by Spearman–Brown and carries the contrast with it — three seasons would put ρ<sub>D</sub> near 0.20 on a fixed intercorrelation. Hierarchical shrinkage of the contrast, multi-season pooling and latent-trait treatment with known measurement error were never tried. None of this rescues the thesis: Test B is a hard null on its own terms, and a measurable q<sub>p</sub> would have had to survive it too. It corrects what this document previously called impossible. Reproduced by <code>scripts/phase0_contrast_arith.py</code>.</p>
     </div>
   </div>
 </section>
@@ -328,72 +331,91 @@ footer{padding:40px 0 0;border-top:1px solid var(--rule-firm);margin-top:8px}
   <div class="panel">
     <div class="panel-head">
       <h3>Every interval falls short of break-even</h3>
-      <p class="eyebrow">Effect on cover probability, percentage points · 95% CI · SEs clustered on team-season</p>
+      <p class="eyebrow">Effect on cover probability, percentage points · 95% CI · clustered on team-season, and by wild cluster bootstrap</p>
     </div>
     <div class="chart-scroll">
-      <svg viewBox="0 0 760 292" width="760" height="292" role="img" aria-label="Confidence intervals for five specifications. Every interval's upper bound falls short of the 2.38 percentage point break-even threshold; the widest, the top decile of system distance, reaches 2.14.">
-        <!-- scale: x(pp) = 318 + pp*100 -->
-        <line x1="318" y1="44" x2="318" y2="230" stroke="var(--rule-firm)" stroke-width="1"/>
+      <svg viewBox="0 0 760 375" width="760" height="375" role="img" aria-label="Confidence intervals for five specifications, cluster-robust and wild cluster bootstrap. Every upper bound falls short of the 2.38 percentage point break-even threshold; the widest after correction, the upper quartile of system distance, reaches 2.02, and the top decile tightens from 2.12 to 1.95.">
+        <!-- scale: x(pp) = 368.0 + pp*83.3333 -->
+        <line x1="368.0" y1="44" x2="368.0" y2="268" stroke="var(--rule-firm)" stroke-width="1"/>
         <!-- break-even at 2.38pp -->
-        <line x1="556" y1="36" x2="556" y2="230" stroke="var(--null)" stroke-width="1.5" stroke-dasharray="4 3"/>
-        <text x="556" y="28" fill="var(--null)" font-family="IBM Plex Mono, monospace" font-size="11" text-anchor="middle">break-even 2.38pp</text>
+        <line x1="566.3" y1="36" x2="566.3" y2="268" stroke="var(--null)" stroke-width="1.5" stroke-dasharray="4 3"/>
+        <text x="566.3" y="28" fill="var(--null)" font-family="IBM Plex Mono, monospace" font-size="11" text-anchor="middle">break-even 2.38pp</text>
 
         <g font-family="IBM Plex Mono, monospace" font-size="11.5">
-          <!-- Test B thesis -->
-          <text x="0" y="64" fill="var(--ink)" font-size="12">Test B · 2022–25</text>
-          <line x1="232.9" y1="60" x2="408.3" y2="60" stroke="var(--accent)" stroke-width="2.5"/>
-          <line x1="232.9" y1="54" x2="232.9" y2="66" stroke="var(--accent)" stroke-width="1.5"/>
-          <line x1="408.3" y1="54" x2="408.3" y2="66" stroke="var(--accent)" stroke-width="1.5"/>
-          <circle cx="320.3" cy="60" r="4.5" fill="var(--accent)"/>
-          <text x="736" y="64" fill="var(--ink-faint)" text-anchor="end">n=2350</text>
+          <!-- Test B, thesis 2022-25 -->
+          <text x="0" y="70" fill="var(--ink)" font-size="12">Test B · 2022–25</text>
+          <line x1="297.0" y1="62" x2="442.9" y2="62" stroke="var(--rule-firm)" stroke-width="1.5"/>
+          <line x1="442.9" y1="58" x2="442.9" y2="66" stroke="var(--rule-firm)" stroke-width="1.2"/>
+          <line x1="297.0" y1="58" x2="297.0" y2="66" stroke="var(--rule-firm)" stroke-width="1.2"/>
+          <line x1="285.3" y1="75" x2="447.4" y2="75" stroke="var(--accent)" stroke-width="2.5"/>
+          <line x1="285.3" y1="69" x2="285.3" y2="81" stroke="var(--accent)" stroke-width="1.5"/>
+          <line x1="447.4" y1="69" x2="447.4" y2="81" stroke="var(--accent)" stroke-width="1.5"/>
+          <circle cx="370.0" cy="75" r="4.5" fill="var(--accent)"/>
+          <text x="736" y="70" fill="var(--ink-faint)" text-anchor="end">n=2350 · G=330</text>
 
-          <!-- Test B long -->
-          <text x="0" y="102" fill="var(--ink)" font-size="12">Test B · 2015–25</text>
-          <line x1="256.1" y1="98" x2="410.8" y2="98" stroke="var(--accent)" stroke-width="2.5"/>
-          <line x1="256.1" y1="92" x2="256.1" y2="104" stroke="var(--accent)" stroke-width="1.5"/>
-          <line x1="410.8" y1="92" x2="410.8" y2="104" stroke="var(--accent)" stroke-width="1.5"/>
-          <circle cx="332.7" cy="98" r="4.5" fill="var(--accent)"/>
-          <text x="736" y="102" fill="var(--ink-faint)" text-anchor="end">n=5022</text>
+          <!-- Test B, long 2015-25 -->
+          <text x="0" y="122" fill="var(--ink)" font-size="12">Test B · 2015–25</text>
+          <line x1="315.9" y1="114" x2="444.3" y2="114" stroke="var(--rule-firm)" stroke-width="1.5"/>
+          <line x1="444.3" y1="110" x2="444.3" y2="118" stroke="var(--rule-firm)" stroke-width="1.2"/>
+          <line x1="315.9" y1="110" x2="315.9" y2="118" stroke="var(--rule-firm)" stroke-width="1.2"/>
+          <line x1="307.7" y1="127" x2="446.7" y2="127" stroke="var(--accent)" stroke-width="2.5"/>
+          <line x1="307.7" y1="121" x2="307.7" y2="133" stroke="var(--accent)" stroke-width="1.5"/>
+          <line x1="446.7" y1="121" x2="446.7" y2="133" stroke="var(--accent)" stroke-width="1.5"/>
+          <circle cx="380.1" cy="127" r="4.5" fill="var(--accent)"/>
+          <text x="736" y="122" fill="var(--ink-faint)" text-anchor="end">n=5022 · G=770</text>
 
-          <!-- p75 -->
-          <text x="0" y="140" fill="var(--ink)" font-size="12">|distance| &gt; p75</text>
-          <line x1="258.7" y1="136" x2="526.9" y2="136" stroke="var(--ink-faint)" stroke-width="2.5"/>
-          <line x1="258.7" y1="130" x2="258.7" y2="142" stroke="var(--ink-faint)" stroke-width="1.5"/>
-          <line x1="526.9" y1="130" x2="526.9" y2="142" stroke="var(--ink-faint)" stroke-width="1.5"/>
-          <circle cx="392.5" cy="136" r="4.5" fill="var(--ink-faint)"/>
-          <text x="736" y="140" fill="var(--ink-faint)" text-anchor="end">n=583</text>
+          <!-- |distance| > p75, thesis -->
+          <text x="0" y="174" fill="var(--ink)" font-size="12">|distance| &gt; p75</text>
+          <line x1="314.2" y1="166" x2="537.4" y2="166" stroke="var(--rule-firm)" stroke-width="1.5"/>
+          <line x1="537.4" y1="162" x2="537.4" y2="170" stroke="var(--rule-firm)" stroke-width="1.2"/>
+          <line x1="314.2" y1="162" x2="314.2" y2="170" stroke="var(--rule-firm)" stroke-width="1.2"/>
+          <line x1="275.5" y1="179" x2="536.3" y2="179" stroke="var(--ink-faint)" stroke-width="2.5"/>
+          <line x1="275.5" y1="173" x2="275.5" y2="185" stroke="var(--ink-faint)" stroke-width="1.5"/>
+          <line x1="536.3" y1="173" x2="536.3" y2="185" stroke="var(--ink-faint)" stroke-width="1.5"/>
+          <circle cx="425.8" cy="179" r="4.5" fill="var(--ink-faint)"/>
+          <text x="736" y="174" fill="var(--ink-faint)" text-anchor="end">n=581 · G=83</text>
 
-          <!-- p90 -->
-          <text x="0" y="178" fill="var(--ink)" font-size="12">|distance| &gt; p90</text>
-          <line x1="181.3" y1="174" x2="532.1" y2="174" stroke="var(--ink-faint)" stroke-width="2.5"/>
-          <line x1="181.3" y1="168" x2="181.3" y2="180" stroke="var(--ink-faint)" stroke-width="1.5"/>
-          <line x1="532.1" y1="168" x2="532.1" y2="180" stroke="var(--ink-faint)" stroke-width="1.5"/>
-          <circle cx="356.4" cy="174" r="4.5" fill="var(--ink-faint)"/>
-          <text x="736" y="178" fill="var(--ink-faint)" text-anchor="end">n=231</text>
+          <!-- |distance| > p90, thesis -->
+          <text x="0" y="226" fill="var(--ink)" font-size="12">|distance| &gt; p90</text>
+          <line x1="249.7" y1="218" x2="544.9" y2="218" stroke="var(--rule-firm)" stroke-width="1.5"/>
+          <line x1="544.9" y1="214" x2="544.9" y2="222" stroke="var(--rule-firm)" stroke-width="1.2"/>
+          <line x1="249.7" y1="214" x2="249.7" y2="222" stroke="var(--rule-firm)" stroke-width="1.2"/>
+          <line x1="174.0" y1="231" x2="530.6" y2="231" stroke="var(--ink-faint)" stroke-width="2.5"/>
+          <line x1="174.0" y1="225" x2="174.0" y2="237" stroke="var(--ink-faint)" stroke-width="1.5"/>
+          <line x1="530.6" y1="225" x2="530.6" y2="237" stroke="var(--ink-faint)" stroke-width="1.5"/>
+          <circle cx="397.3" cy="231" r="4.5" fill="var(--ink-faint)"/>
+          <text x="736" y="226" fill="var(--ink-faint)" text-anchor="end">n=230 · G=35</text>
 
           <!-- Test A -->
-          <text x="0" y="216" fill="var(--ink)" font-size="12">Test A · in the price?</text>
-          <line x1="305.1" y1="212" x2="431.5" y2="212" stroke="var(--held)" stroke-width="2.5"/>
-          <line x1="305.1" y1="206" x2="305.1" y2="218" stroke="var(--held)" stroke-width="1.5"/>
-          <line x1="431.5" y1="206" x2="431.5" y2="218" stroke="var(--held)" stroke-width="1.5"/>
-          <circle cx="367.5" cy="212" r="4.5" fill="var(--held)"/>
-          <text x="736" y="216" fill="var(--ink-faint)" text-anchor="end">p=0.122</text>
+          <text x="0" y="274" fill="var(--ink)" font-size="12">Test A · in the price?</text>
+          <line x1="357.3" y1="270" x2="462.6" y2="270" stroke="var(--held)" stroke-width="2.5"/>
+          <line x1="357.3" y1="264" x2="357.3" y2="276" stroke="var(--held)" stroke-width="1.5"/>
+          <line x1="462.6" y1="264" x2="462.6" y2="276" stroke="var(--held)" stroke-width="1.5"/>
+          <circle cx="409.2" cy="270" r="4.5" fill="var(--held)"/>
+          <text x="736" y="274" fill="var(--ink-faint)" text-anchor="end">p=0.122</text>
         </g>
 
-        <!-- axis -->
-        <line x1="118" y1="250" x2="618" y2="250" stroke="var(--rule-firm)" stroke-width="1"/>
-        <g font-family="IBM Plex Mono, monospace" font-size="11" fill="var(--ink-faint)" text-anchor="middle">
-          <line x1="118" y1="250" x2="118" y2="255" stroke="var(--rule-firm)"/><text x="118" y="270">−2</text>
-          <line x1="218" y1="250" x2="218" y2="255" stroke="var(--rule-firm)"/><text x="218" y="270">−1</text>
-          <line x1="318" y1="250" x2="318" y2="255" stroke="var(--rule-firm)"/><text x="318" y="270">0</text>
-          <line x1="418" y1="250" x2="418" y2="255" stroke="var(--rule-firm)"/><text x="418" y="270">1</text>
-          <line x1="518" y1="250" x2="518" y2="255" stroke="var(--rule-firm)"/><text x="518" y="270">2</text>
-          <line x1="618" y1="250" x2="618" y2="255" stroke="var(--rule-firm)"/><text x="618" y="270">3</text>
+        <g font-family="IBM Plex Mono, monospace" font-size="10.5" fill="var(--ink-faint)">
+          <line x1="118" y1="298" x2="146" y2="298" stroke="var(--rule-firm)" stroke-width="1.5"/>
+          <text x="152" y="302">cluster-robust</text>
+          <line x1="252" y1="298" x2="280" y2="298" stroke="var(--accent)" stroke-width="2.5"/>
+          <text x="286" y="302">wild cluster bootstrap, null imposed</text>
         </g>
-        <text x="368" y="288" fill="var(--ink-faint)" font-family="IBM Plex Mono, monospace" font-size="10.5" text-anchor="middle">effect on cover probability (percentage points)</text>
+
+        <line x1="118" y1="324" x2="618" y2="324" stroke="var(--rule-firm)" stroke-width="1"/>
+        <g font-family="IBM Plex Mono, monospace" font-size="11" fill="var(--ink-faint)" text-anchor="middle">
+          <line x1="118" y1="324" x2="118" y2="329" stroke="var(--rule-firm)"/><text x="118" y="344">−3</text>
+          <line x1="201" y1="324" x2="201" y2="329" stroke="var(--rule-firm)"/><text x="201" y="344">−2</text>
+          <line x1="285" y1="324" x2="285" y2="329" stroke="var(--rule-firm)"/><text x="285" y="344">−1</text>
+          <line x1="368" y1="324" x2="368" y2="329" stroke="var(--rule-firm)"/><text x="368" y="344">0</text>
+          <line x1="451" y1="324" x2="451" y2="329" stroke="var(--rule-firm)"/><text x="451" y="344">1</text>
+          <line x1="535" y1="324" x2="535" y2="329" stroke="var(--rule-firm)"/><text x="535" y="344">2</text>
+          <line x1="618" y1="324" x2="618" y2="329" stroke="var(--rule-firm)"/><text x="618" y="344">3</text>
+        </g>
+        <text x="368" y="362" fill="var(--ink-faint)" font-family="IBM Plex Mono, monospace" font-size="10.5" text-anchor="middle">effect on cover probability (percentage points)</text>
       </svg>
     </div>
-    <p class="figcap">Converted from points of margin at 0.4/σ<sub>game</sub> with σ<sub>game</sub> = 15.51, measured from the residuals rather than assumed. The widest upper bound anywhere — the top decile of system distance, 35 clusters — reaches 2.14pp and still falls short of the 2.38pp needed to clear vig at −110.</p>
+    <p class="figcap">Converted from points of margin at 0.4/σ<sub>game</sub> with σ<sub>game</sub> = 15.51, measured from the residuals rather than assumed. The tail specifications are thin — the top decile has 35 clusters — and the cluster-robust variance estimator is asymptotic in clusters, not observations. On this cluster structure it rejects a true null 9.5% of the time at a nominal 5%. Both estimators are therefore shown: the thin bar is cluster-robust, the heavy bar is a wild cluster bootstrap-t with the null imposed (Rademacher weights, 9,999 replications, interval by test inversion), which rejects at 5.9%. Correction widens every interval — 1.21× at the top decile — but asymmetrically, and to the left: the top-decile upper bound <em>falls</em> from 2.12pp to 1.95pp. The widest upper bound anywhere is now 2.02pp. Every one still falls short of the 2.38pp needed to clear vig at −110. Reproduced by <code>scripts/phase0_wildboot.py</code>.</p>
   </div>
 
   <div class="col stack" style="margin-top:34px">
@@ -478,8 +500,12 @@ footer{padding:40px 0 0;border-top:1px solid var(--rule-firm);margin-top:8px}
       <p>Transfer rate among tape-qualified starters jumps from 5.3% to 29.3% at the one-time-transfer rule. Pre-2022 seasons are not a usable control period — the treatment barely existed.</p>
     </article>
     <article>
+      <h3>Forty duplicated team-games</h3>
+      <p>Found while making the tail specifications reproducible. Nine team-seasons carry two rows in the Φ panel, from two mechanisms: <code>is_primary_coach</code> ties when a firing splits a season evenly, and the prior-coach join fans out when the quarterback’s previous team also had two coaches of record. Purdue 2017 and Georgia Southern 2018 survive the measurability filter twice, at two different distances, and drag their opponents’ rows in with them — 40 of the 5,022 team-games, all in 2016–18, none in the thesis window. The reported estimates are unmoved, but the panel is not unique on (school, season) and downstream joins on that key must dedupe.</p>
+    </article>
+    <article>
       <h3>Absence at this magnitude only</h3>
-      <p>An effect below roughly 0.9pp of cover probability is entirely consistent with these data. The claim is that no <em>tradeable</em> effect exists, not that the coefficient is exactly zero.</p>
+      <p>An effect below roughly 0.95pp of cover probability is entirely consistent with these data. The claim is that no <em>tradeable</em> effect exists, not that the coefficient is exactly zero.</p>
     </article>
   </div>
 </section>
@@ -491,7 +517,9 @@ footer{padding:40px 0 0;border-top:1px solid var(--rule-firm);margin-top:8px}
 python scripts/build_panel.py          # coach panel, tenure-dated
 python scripts/test_systems_travel.py  # test 01
 python scripts/test_qp_stability.py    # test 03
-python scripts/stage3_gate_game.py     # the gate</div>
+python scripts/stage3_gate_game.py     # the gate
+python scripts/phase0_wildboot.py      # bootstrap correction, tails
+python scripts/phase0_contrast_arith.py</div>
   <p style="color:var(--ink-faint);font-size:.82rem;margin-top:20px">Walk-forward discipline throughout: coaching hires, portal moves and recruiting classes filtered by announcement date rather than season label. No pooled cross-validation across seasons. Effect sizes and the minimum detectable effect were fixed before the gate was run.</p>
 </footer>
 
