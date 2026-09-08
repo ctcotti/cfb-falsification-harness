@@ -74,6 +74,36 @@ def play_jobs(client: CFBDClient, years: list[int]) -> list[Job]:
     return jobs
 
 
+def drive_jobs(client: CFBDClient, years: list[int]) -> list[Job]:
+    """Week-scoped drive pulls, sized from /calendar exactly as plays are.
+
+    Not redundant with /plays. The `clock` on a play is frozen at the drive's
+    start value for 35-41% of drives in 2015-19, falling to 5-8% by 2024-25, so
+    seconds-per-play is not recoverable from play-to-play deltas over most of
+    the long window -- and because the defect shrinks monotonically across the
+    panel it would enter any variance decomposition as a year effect. /drives
+    carries `elapsed` directly and it is clean: on 2016 week 5, a season 37%
+    frozen at play level, elapsed matches startTime - endTime on 100% of
+    within-period drives, with 1 negative and 8 implausible values in 1,558.
+    """
+    jobs: list[Job] = []
+    for year in years:
+        try:
+            cal = client.get("calendar", {"year": year}, season=year).data
+        except (CFBDError, BudgetExceeded):
+            weeks = list(range(0, 17))
+        else:
+            weeks = sorted({
+                w["week"] for w in cal
+                if w.get("seasonType") == "regular" and w.get("week") is not None
+            }) or list(range(0, 17))
+        for wk in weeks:
+            jobs.append(("drives", {"year": year, "week": wk,
+                                    "seasonType": "regular",
+                                    "classification": "fbs"}, year))
+    return jobs
+
+
 def tenure_jobs(client: CFBDClient, years: list[int]) -> list[Job]:
     """One /coaches/tenures call per distinct FBS team.
 
@@ -136,9 +166,15 @@ def main() -> None:
     base = season_scoped_jobs()
     if args.dry_run:
         n = report(client, base, "phase 1 (season-scoped)")
+        # Week-scoped pulls can only be priced once /calendar is cached.
+        try:
+            n += report(client, drive_jobs(client, LONG_WINDOW), "drives")
+        except (CFBDError, BudgetExceeded):
+            print(f"\ndrives: needs /calendar cached to plan; expect "
+                  f"~{len(LONG_WINDOW) * 15} calls")
         print(f"\nphase 2 (tenures/plays) needs phase 1 cached to plan; "
               f"expect ~145 tenure calls + ~{len(LONG_WINDOW) * 15} play calls")
-        print(f"\nphase 1 estimate: {n} calls")
+        print(f"\ntotal estimate: {n} calls")
         return
 
     run(client, base, "phase 1")
@@ -146,6 +182,8 @@ def main() -> None:
     run(client, tenures, "phase 2a (coach tenures)")
     plays = play_jobs(client, LONG_WINDOW)
     run(client, plays, "phase 2b (plays)")
+    drives = drive_jobs(client, LONG_WINDOW)
+    run(client, drives, "phase 2c (drives)")
 
     print(f"\ntotal live calls this month: {client.calls_this_month()}")
 

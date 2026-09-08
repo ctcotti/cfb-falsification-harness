@@ -33,14 +33,20 @@ ERA_BREAK = 2022  # collective era begins
 
 
 def coach_system_estimates(tendency: pd.DataFrame,
-                           panel: pd.DataFrame) -> pd.DataFrame:
+                           panel: pd.DataFrame,
+                           axis: str = "early_down_pass_rate") -> pd.DataFrame:
     """Shrunk, decayed estimate of each coach's system as of each season.
 
     Returned keyed on (coach_id, as_of_season), using only seasons strictly
     before as_of_season -- so it is always usable ex ante.
+
+    `axis` selects the column to summarise. It defaults to the Phase 1 axis so
+    every existing caller is unchanged; Phase 2 passes a pace column through the
+    same estimator, which matters because the decay, the shrinkage constant and
+    the as-of rule are what make the two comparable.
     """
     t = tendency.copy()
-    t["dz"] = t.groupby("season")["early_down_pass_rate"].transform(
+    t["dz"] = t.groupby("season")[axis].transform(
         lambda s: (s - s.mean()) / s.std(ddof=0))
     coach = panel[panel["is_primary_coach"]][["school", "season", "coach_id"]]
     hist = t.merge(coach, on=["school", "season"])[["coach_id", "season", "dz"]]
