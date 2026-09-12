@@ -48,8 +48,9 @@ coaching-change indicator (R²=0.673) drops it to +0.192, p=0.122. So both sides
 are null. This is not "the market got there first" — the interaction does not
 exist at measurable magnitude.
 
-Writeup: [`writeup/coaching-fit-null.pdf`](writeup/coaching-fit-null.pdf) (GitHub renders it inline);
-the source is [`writeup/coaching-fit-null.html`](writeup/coaching-fit-null.html).
+Writeup: **<https://ctcotti.com/research/coaching-fit-null>** — the canonical rendered
+version. Also committed here as [`writeup/coaching-fit-null.pdf`](writeup/coaching-fit-null.pdf), which GitHub
+renders inline, with the HTML source beside it.
 
 ## What held and what died
 
