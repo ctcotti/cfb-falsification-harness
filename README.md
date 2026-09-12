@@ -48,7 +48,8 @@ coaching-change indicator (R²=0.673) drops it to +0.192, p=0.122. So both sides
 are null. This is not "the market got there first" — the interaction does not
 exist at measurable magnitude.
 
-Writeup: <https://claude.ai/code/artifact/2c64214d-545f-4c94-b2fb-b57da4887253>
+Writeup: [`writeup/coaching-fit-null.pdf`](writeup/coaching-fit-null.pdf) (GitHub renders it inline);
+the source is [`writeup/coaching-fit-null.html`](writeup/coaching-fit-null.html).
 
 ## What held and what died
 
